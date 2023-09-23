@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 // eslint-disable-next-line no-undef
-const connectionString = process.env.MONGO_DB_URI;
+const connectionString = `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@fullstack.9nl1oab.mongodb.net/${process.env.DATA_BASE}?retryWrites=true&w=majority`;
 
 mongoose
   .connect(connectionString)
