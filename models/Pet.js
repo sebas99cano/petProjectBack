@@ -6,10 +6,10 @@ const petSchema = new Schema({
   age: String,
   weight: Number,
   client: { type: Schema.Types.ObjectId, ref: "Client" },
-  medicament: [
+  consults: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Medicament",
+      ref: "Consult",
     },
   ],
 });

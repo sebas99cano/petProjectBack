@@ -1,5 +1,6 @@
 const clientRouter = require("express").Router();
 const Client = require("../models/Client");
+const Consult = require("../models/Consult");
 const Pet = require("../models/Pet");
 
 clientRouter.get("/", async (request, response, next) => {
@@ -44,8 +45,19 @@ clientRouter.put("/:id", async (request, response, next) => {
 clientRouter.delete("/:id", async (request, response, next) => {
   const { id } = request.params;
   try {
-    const deletedClient = await Client.findByIdAndRemove(id);
-    await Pet.deleteMany({ client: deletedClient.id });
+    //buscamos las mascotas que tenia asociado ese usuario y las borramos
+    const pets = await Pet.find({ client: id });
+    if (Array.isArray(pets) && pets.length > 0) {
+      pets.forEach(async (petElement) => {
+        //buscamos las consultas asociadas a cada mascota del usuario y las borramos
+        const consults = await Consult.find({ pet: petElement._id });
+        if (Array.isArray(consults) && consults.length > 0) {
+          await Consult.deleteMany({ pet: petElement._id });
+        }
+      });
+      await Pet.deleteMany({ client: id });
+    }
+    await Client.findByIdAndRemove(id);
     response.status(204).end();
   } catch (error) {
     next(error);

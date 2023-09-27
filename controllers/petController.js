@@ -1,12 +1,13 @@
 const petRouter = require("express").Router();
 const Client = require("../models/Client");
+const Consult = require("../models/Consult");
 const Pet = require("../models/Pet");
 
 petRouter.get("/", async (request, response, next) => {
   try {
     const medicaments = await Pet.find()
       .populate("client", { dni: 1, name: 1, direction: 1, phone: 1 })
-      .populate("medicament");
+      .populate("consults");
     response.json(medicaments);
   } catch (error) {
     next(error);
@@ -47,6 +48,20 @@ petRouter.put("/:id", (request, response, next) => {
       response.json(updatePet);
     })
     .catch((error) => next(error));
+});
+
+petRouter.delete("/:id", async (request, response, next) => {
+  const { id } = request.params;
+  try {
+    const consults = await Consult.find({ pet: id });
+    if (Array.isArray(consults) && consults.length > 0) {
+      await Consult.deleteMany({ pet: id });
+    }
+    await Pet.findByIdAndRemove(id);
+    response.status(204).end();
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = petRouter;

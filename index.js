@@ -8,6 +8,7 @@ const handleErrors = require("./middleware/handleErrors");
 const medicamentRouter = require("./controllers/medicamentController");
 const clientRouter = require("./controllers/clientController");
 const petRouter = require("./controllers/petController");
+const consultRouter = require("./controllers/consultController");
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,8 @@ app.get("/", (request, response) => {
 app.use("/api/client", clientRouter);
 
 app.use("/api/pet", petRouter);
+
+app.use("/api/consult", consultRouter);
 
 app.use("/api/medicament", medicamentRouter);
 
