@@ -5,7 +5,7 @@ const Pet = require("../models/Pet");
 
 clientRouter.get("/", async (request, response, next) => {
   try {
-    const clients = await Client.find();
+    const clients = await Client.find().populate("pets", { name: 1 });
     response.json(clients);
   } catch (error) {
     next(error);
