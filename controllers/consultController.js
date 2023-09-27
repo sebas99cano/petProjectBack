@@ -37,6 +37,21 @@ consultRouter.post("/", async (request, response, next) => {
   }
 });
 
+consultRouter.put("/:id", (request, response, next) => {
+  const { id } = request.params;
+  const consult = request.body;
+  const newConsultInfo = {
+    description: consult.description,
+    pet: consult.pet,
+    medicaments: consult.medicaments,
+  };
+  Consult.findByIdAndUpdate(id, newConsultInfo, { new: true })
+    .then((updatedConsult) => {
+      response.json(updatedConsult);
+    })
+    .catch((error) => next(error));
+});
+
 consultRouter.delete("/:id", async (request, response, next) => {
   const { id } = request.params;
   try {
