@@ -5,7 +5,9 @@ const consultRouter = require("express").Router();
 
 consultRouter.get("/", async (request, response, next) => {
   try {
-    const consults = await Consult.find().populate("pet", { consults: 0 });
+    const consults = await Consult.find()
+      .populate("pet", { consults: 0 })
+      .populate("medicaments", { name: 1 });
     response.json(consults);
   } catch (error) {
     next(error);

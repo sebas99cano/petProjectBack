@@ -1,4 +1,5 @@
 const medicamentRouter = require("express").Router();
+const Consult = require("../models/Consult");
 const Medicament = require("../models/Medicament");
 
 medicamentRouter.get("/", async (request, response, next) => {
@@ -43,7 +44,21 @@ medicamentRouter.put("/:id", async (request, response, next) => {
 medicamentRouter.delete("/:id", async (request, response, next) => {
   const { id } = request.params;
   try {
-    await Medicament.findByIdAndRemove(id);
+    const medicamentDeleted = await Medicament.findByIdAndRemove(id);
+    const consults = await Consult.find({
+      medicaments: { $in: [medicamentDeleted._id] },
+    });
+
+    if (Array.isArray(consults) && consults.length > 0) {
+      consults.forEach(async (consultElement) => {
+        consultElement.medicaments = consultElement.medicaments.filter(
+          (medicamentId) =>
+            medicamentId.toString() !== medicamentDeleted._id.toString()
+        );
+        await consultElement.save();
+      });
+    }
+
     response.status(204).end();
   } catch (error) {
     next(error);

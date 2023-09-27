@@ -53,11 +53,18 @@ petRouter.put("/:id", (request, response, next) => {
 petRouter.delete("/:id", async (request, response, next) => {
   const { id } = request.params;
   try {
-    const consults = await Consult.find({ pet: id });
+    const petDeleted = await Pet.findByIdAndRemove(id);
+    const consults = await Consult.find({ pet: petDeleted._id });
     if (Array.isArray(consults) && consults.length > 0) {
-      await Consult.deleteMany({ pet: id });
+      await Consult.deleteMany({ pet: petDeleted._id });
     }
-    await Pet.findByIdAndRemove(id);
+
+    const petClient = await Client.findOne({ pets: { $in: [petDeleted._id] } });
+    petClient.pets = petClient.pets.filter(
+      (petId) => petId.toString() !== petDeleted._id.toString()
+    );
+    await petClient.save();
+
     response.status(204).end();
   } catch (error) {
     next(error);
