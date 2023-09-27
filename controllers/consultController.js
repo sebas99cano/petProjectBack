@@ -15,7 +15,7 @@ consultRouter.get("/", async (request, response, next) => {
 });
 
 consultRouter.post("/", async (request, response, next) => {
-  const { description, petId, medicaments } = request.body;
+  const { description, petId, medicamentsId } = request.body;
   try {
     const pet = await Pet.findById(petId);
 
@@ -23,7 +23,7 @@ consultRouter.post("/", async (request, response, next) => {
       date: new Date(),
       description: description,
       pet: pet._id,
-      medicaments: medicaments,
+      medicaments: medicamentsId,
     });
 
     const savedConsult = await newConsult.save();
@@ -42,8 +42,8 @@ consultRouter.put("/:id", (request, response, next) => {
   const consult = request.body;
   const newConsultInfo = {
     description: consult.description,
-    pet: consult.pet,
-    medicaments: consult.medicaments,
+    pet: consult.petId,
+    medicaments: consult.medicamentsId,
   };
   Consult.findByIdAndUpdate(id, newConsultInfo, { new: true })
     .then((updatedConsult) => {
